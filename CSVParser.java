@@ -31,14 +31,13 @@ public class CSVParser {
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(",");
             String position = parts[1].trim();
-            int timeduration = Integer.parseInt(parts[3].trim()) - 1; // Minus 1 to start from 0
+            int timeduration = Integer.parseInt(parts[3].trim()) - 1; // Start timeduration from 0
             String bssid = parts[5].trim();
-            // String rssi = parts[6].trim(); // No longer needed
+            String rssi = parts[6].trim();
 
             Map<Integer, Map<String, String>> positionData = data.getOrDefault(position, new TreeMap<>());
             Map<String, String> timedurationData = positionData.getOrDefault(timeduration, new HashMap<>());
-            // timedurationData.put("rssi", rssi); // No longer needed
-            timedurationData.put(bssid, "-120"); // Set default value to -120
+            timedurationData.put(bssid, rssi);
 
             positionData.put(timeduration, timedurationData);
             data.put(position, positionData);
@@ -62,9 +61,7 @@ public class CSVParser {
         List<String> headers = new ArrayList<>();
         headers.add("position");
         headers.add("timeduration");
-        for (String bssid : uniqueBssids) {
-            headers.add(bssid);
-        }
+        headers.addAll(uniqueBssids);
 
         writer.writeNext(headers.toArray(new String[0]));
 
